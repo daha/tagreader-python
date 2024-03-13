@@ -428,15 +428,10 @@ class AspenHandlerWeb(BaseHandlerWeb):
         params = self.generate_search_query(
             tag=tag, desc=desc, datasource=self.datasource
         )
-        # Ensure space is encoded as "%20" instead of default "+" and leave asterisks
-        # unencoded. Otherwise, searches for tags containing spaces break, as do wildcard
-        # searches.
-        encoded_params = urllib.parse.urlencode(
-            params, safe="*", quote_via=urllib.parse.quote
-        )
-        url = urljoin(self.base_url, "Browse?")
-        url += encoded_params
-        data = self.fetch(url, timeout=timeout)
+        url = urljoin(self.base_url, "Browse")
+        # Convert it to a string to encode it properly in fetch
+        params = "&".join([f"{k}={v}" for k, v in params.items()])
+        data = self.fetch(url, params=params, timeout=timeout)
 
         if "tags" not in data["data"]:
             return ret
