@@ -136,9 +136,12 @@ class BaseHandlerWeb(ABC):
         params: Optional[Union[str, Dict[str, str]]] = None,
         timeout: Optional[int] = None,
     ) -> Dict:
-        res = self.session.get(
+        if isinstance(params, str):
+            params = params.encode("utf-8")
+
+        res = self.session.post(
             url,
-            params=params,
+            data=params,
             timeout=(
                 None,
                 timeout,
@@ -163,7 +166,10 @@ class BaseHandlerWeb(ABC):
     def fetch_text(
         self, url, params: Optional[Union[str, Dict[str, str]]] = None
     ) -> str:
-        res = self.session.get(url, params=params)
+        if isinstance(params, str):
+            params = params.encode("utf-8")
+
+        res = self.session.post(url, data=params)
         res.raise_for_status()
 
         return res.text
